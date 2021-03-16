@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  numba-test
+
+  Sample SAM Template for numba-test
+
+Resources:
+  DepLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+        LayerName: sam-app-dependencies
+        Description: Dependencies for sam app
+        ContentUri: dependencies
+        CompatibleRuntimes:
+          - python3.8   
+        LicenseInfo: 'MIT'
+        RetentionPolicy: Retain
+
+  FibonacciFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: fibonacci/
+      Handler: normal.lambda_handler
+      Timeout: 10
+      Policies:
+        - AWSLambdaFullAccess
+      Layers:
+        - !Ref DepLayer
+      Runtime: python3.8
+      Events:
+        HelloWorld:
+          Type: Api 
+          Properties:
+            Path: /fibonacci
+            Method: get
+
+  FibonacciJittedFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: fibonacci/
+      Handler: jitted.lambda_handler
+      Timeout: 10
+      Policies:
+        - AWSLambdaFullAccess
+      Layers:
+        - !Ref DepLayer
+      Runtime: python3.8
+      Events:
+        HelloWorld:
+          Type: Api 
+          Properties:
+            Path: /fibonacci_jitted
+            Method: get
+
